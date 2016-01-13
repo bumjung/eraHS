@@ -34,21 +34,21 @@ namespace eraHS.LogReader
                 if (heroMatch.Success)
                 {
                     int heroId = Int32.Parse(heroMatch.Groups[2].Value) - 1;
-                    // Console.WriteLine(Hero.HeroIdList[heroId] + " " + heroMatch.Groups[1].Value);
+                    // { ENTITY_ID, Hero_name }
                     heroEntityDict.Add(Int32.Parse(heroMatch.Groups[1].Value), Hero.HeroIdList[heroId]);
 
                 }
                 Match playerMatch = RegexManager.playerNameRegex.Match(line);
                 if (playerMatch.Success)
                 {
-                    // Console.WriteLine(playerMatch.Groups[1].Value + " " + playerMatch.Groups[2].Value);
+                    // { Username, ENTITY_ID }
                     playerEntityDict.Add(simplifyString(playerMatch.Groups[1].Value), Int32.Parse(playerMatch.Groups[2].Value));
                 }
+                // { Full_Username, WIN/LOSS }
                 Match gameResultMatch = RegexManager.gameResultRegex.Match(line);
                 if (gameResultMatch.Success)
                 {
                     count++;
-                    // Console.WriteLine(gameResultMatch.Groups[1].Value + " " + gameResultMatch.Groups[2].Value);
                     string name = simplifyString(gameResultMatch.Groups[1].Value);
                     if (playerEntityDict.ContainsKey(name)) {
                         Console.WriteLine(gameResultMatch.Groups[1].Value + '\t' + heroEntityDict[playerEntityDict[name]] + '\t' + gameResultMatch.Groups[2].Value);
