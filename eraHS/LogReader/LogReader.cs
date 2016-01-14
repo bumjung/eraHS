@@ -2,72 +2,53 @@
 using eraHS.Utility.RegexHelper;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace eraHS.LogReader
 {
     class LogReader
     {
-        string logFilePath;
+        private string _logFilePath;
+        private int _offset;
+        List<String> gameLogLines;
 
-        public LogReader()
+        public LogReader(List<String> lines)
         {
-            this.init();
-        }
-
-        void init()
-        {
-            logFilePath = Config.userFilePath + @"\Power.log";
+            _logFilePath = Config.userFilePath + @"\Power.log";
+            _offset = 0;
+            gameLogLines = lines;
         }
 
         public void readLogFile()
         {
-            Dictionary<int, String> heroEntityDict = new Dictionary<int, String>();
-            Dictionary<String, int> playerEntityDict = new Dictionary<String, int>();
-            string[] lines = System.IO.File.ReadAllLines(logFilePath);
-            int count = 0;
-
-            foreach (string line in lines)
+            using(FileStream fileStream = new FileStream(_logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                Match heroMatch = RegexManager.heroIdRegex.Match(line);
-                if (heroMatch.Success)
+                fileStream.Seek(_offset, SeekOrigin.Begin);
+                // TODO: end of file, not equal...
+                while (fileStream.Length == _offset)
                 {
-                    int heroId = Int32.Parse(heroMatch.Groups[2].Value) - 1;
-                    // { ENTITY_ID, Hero_name }
-                    heroEntityDict.Add(Int32.Parse(heroMatch.Groups[1].Value), Hero.HeroIdList[heroId]);
-
+                    LogManager.sem.WaitOne();
                 }
-                Match playerMatch = RegexManager.playerNameRegex.Match(line);
-                if (playerMatch.Success)
-                {
-                    // { Username, ENTITY_ID }
-                    playerEntityDict.Add(simplifyString(playerMatch.Groups[1].Value), Int32.Parse(playerMatch.Groups[2].Value));
-                }
-                // { Full_Username, WIN/LOSS }
-                Match gameResultMatch = RegexManager.gameResultRegex.Match(line);
-                if (gameResultMatch.Success)
-                {
-                    count++;
-                    string name = simplifyString(gameResultMatch.Groups[1].Value);
-                    if (playerEntityDict.ContainsKey(name)) {
-                        Console.WriteLine(gameResultMatch.Groups[1].Value + '\t' + heroEntityDict[playerEntityDict[name]] + '\t' + gameResultMatch.Groups[2].Value);
-                    }
 
-                    if (count % 2 == 0)
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string line;
+                    while (!streamReader.EndOfStream && (line = streamReader.ReadLine()) != null)
                     {
+                        gameLogLines.Add(line);
+                        Match endGameMatch = RegexManager.goldRewardRegex.Match(line);
 
-                        playerEntityDict.Clear();
-                        heroEntityDict.Clear();
+                        _offset += Encoding.UTF8.GetByteCount(line + Environment.NewLine);
+                        if (endGameMatch.Success) {
+                            LogManager.sync.SignalAndWait();
+                            return;
+                        }
                     }
                 }
             }
         }
-
-        private string simplifyString(string str)
-        {
-            return str.Replace(' ', '_').ToLower();
-        }
-
     }
 }

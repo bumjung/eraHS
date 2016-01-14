@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eraHS.LogReader;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
@@ -13,9 +14,8 @@ namespace eraHS
         public TaskTrayApplicationContext()
         {
             this.init();
-            LogReader.LogReader reader = new LogReader.LogReader();
-
-            reader.readLogFile();
+            LogManager logManager = new LogManager();
+            logManager.start();
         }
 
         void init()

@@ -21,5 +21,10 @@ namespace eraHS.Utility.RegexHelper
         // D 02:56:53.9372700 GameState.DebugPrintPower() - TAG_CHANGE Entity=bums tag=PLAYSTATE value=LOST
         public static readonly Regex gameResultRegex = new Regex(@"^D .*GameState.DebugPrintPower\(\) - TAG_CHANGE Entity=(.*) tag=PLAYSTATE value=(LOST|WON)");
 
+        // D 02:55:54.0534740 GameState.DebugPrintPower() - CREATE_GAME
+        public static readonly Regex createGameRegex = new Regex(@"^D (.*) GameState.DebugPrintPower\(\) - CREATE_GAME");
+
+        //D 02:56:58.7317290 PowerTaskList.DebugPrintPower() - TAG_CHANGE Entity=bums tag=GOLD_REWARD_STATE value=2
+        public static readonly Regex goldRewardRegex = new Regex(@"^D .*PowerTaskList.DebugPrintPower\(\) -.*TAG_CHANGE Entity=.*tag=GOLD_REWARD_STATE.*value=[0-9]*");
     }
 }

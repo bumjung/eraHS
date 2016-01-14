@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Constants\Hearthstone\Hero.cs" />
+    <Compile Include="LogReader\LogManager.cs" />
     <Compile Include="LogReader\LogReader.cs" />
     <Compile Include="TaskTrayApplicationContext.cs" />
     <Compile Include="Configuration.cs">

@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace eraHS
 {
-    class Config
+    public class Config
     {
         public static readonly string userFilePath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%");
         public static readonly string configFilePath = userFilePath + @"\log.config";
-
-
     }
 }
