@@ -89,8 +89,7 @@ namespace eraHS.LogReader
         private void parseLogLines()
         {
             int count = 0;
-            int controller = -1;
-            string cardId = null;
+            int myId = -1;
             foreach (string line in copyGameLogLines)
             {
                 Match heroMatch = RegexManager.heroIdRegex.Match(line);
@@ -109,12 +108,6 @@ namespace eraHS.LogReader
                     _playerEntityDict.Add(simplifyString(username), entityId);
                 }
 
-                Match cardIdCreationMatch = RegexManager.cardIdCreationRegex.Match(line);
-                if (cardIdCreationMatch.Success)
-                {
-                    cardId = cardIdCreationMatch.Groups["cardId"].Value;
-                }
-
                 Match playerIdMatch = RegexManager.playerIdRegex.Match(line);
                 if (playerIdMatch.Success)
                 {
@@ -123,10 +116,10 @@ namespace eraHS.LogReader
                     _playerIdDict.Add(playerId, simplifyString(username));
                 }
 
-                Match controllerMatch = RegexManager.controllerRegex.Match(line);
-                if (controllerMatch.Success)
+                Match mulliganMatch = RegexManager.mulliganRegex.Match(line);
+                if (mulliganMatch.Success)
                 {
-                    if (controller < 0) controller = Int32.Parse(controllerMatch.Groups["value"].Value);
+                    if (myId < 0) myId = Int32.Parse(mulliganMatch.Groups["player"].Value);
                 }
 
                 Match gameResultMatch = RegexManager.gameResultRegex.Match(line);
@@ -140,24 +133,12 @@ namespace eraHS.LogReader
                         string output = username + '\t'
                             + _heroEntityDict[_playerEntityDict[simplifyString(username)]]
                             + '\t' + result;
+                        
+                        if (_playerIdDict[myId] == simplifyString(username))
+                        {
+                            output += '\t' + "ME";
+                        }
 
-                        if (!string.IsNullOrEmpty(cardId))
-                        {
-                            if (_playerIdDict[controller] == simplifyString(username))
-                            {
-                                output += '\t' + "ME";
-                            }
-                        }
-                        else
-                        {
-                            int id = controller % 2 + 1;
-                            if (_playerIdDict[id] == simplifyString(username))
-                            {
-                                output += '\t' + "ME";
-                            }
-                        }
-                        Console.WriteLine(controller+"");
-                        Console.WriteLine(cardId);
                         Console.WriteLine(output);
                     }
 
