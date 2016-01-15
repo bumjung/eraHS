@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace eraHS
@@ -15,7 +16,10 @@ namespace eraHS
         {
             this.init();
             LogManager logManager = new LogManager();
-            logManager.start();
+            var logThread = new Thread(() => {
+                logManager.start();
+            });
+            logThread.Start();
         }
 
         void init()

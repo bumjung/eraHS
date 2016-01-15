@@ -1,12 +1,15 @@
-﻿using eraHS.Constants.Hearthstone;
-using eraHS.Utility.RegexHelper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
+
+using eraHS.Constants.Hearthstone;
+using eraHS.Utility;
+using eraHS.Utility.RegexHelper;
 
 namespace eraHS.LogReader
 {
@@ -15,9 +18,12 @@ namespace eraHS.LogReader
         private LogReader _logReader;
         private Dictionary<int, string> _heroEntityDict;
         private Dictionary<string, int> _playerEntityDict;
+        private Dictionary<int, string> _playerIdDict;
+        private FileSystemWatcher watcher;
+        private int watcherCount;
 
         public static Barrier sync;
-        public static Semaphore sem;
+        public static BinarySemaphore sem;
 
         public List<String> gameLogLines;
         public List<String> copyGameLogLines;
@@ -26,19 +32,24 @@ namespace eraHS.LogReader
         {
             gameLogLines = new List<String>();
             copyGameLogLines = new List<String>();
+
             _logReader = new LogReader(gameLogLines);
             _heroEntityDict = new Dictionary<int, string>();
             _playerEntityDict = new Dictionary<string, int>();
+            _playerIdDict = new Dictionary<int, string>();
+
+            sync = new Barrier(participantCount: 2);
+            sem = new BinarySemaphore(0, 1);
+
         }
 
         public void start()
         {
-            sync = new Barrier(participantCount: 2);
-            sem = new Semaphore(1, 1);
             while (true)
             {
                 var readingLogFile = new Thread(() =>
                 {
+                    this.watcherInit();
                     _logReader.readLogFile();
                 });
                 readingLogFile.Start();
@@ -53,18 +64,33 @@ namespace eraHS.LogReader
                 readingLogFile.Join();
                 parsingLogLines.Join();
 
-                foreach (string line in gameLogLines)
-                {
-                    copyGameLogLines.Add(line);
-                }
-                gameLogLines.Clear();
+                copyGameLogLines.ShallowCopy(gameLogLines);
 
+                gameLogLines.Clear();
             }
+        }
+
+        private void watcherInit()
+        {
+            watcher = new FileSystemWatcher();
+            watcher.Path = Config.userFilePath;
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                                    | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            watcher.Filter = @"Power*.log";
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void OnChanged(object source, FileSystemEventArgs e)
+        {
+            if (++watcherCount % 2 == 0) sem.ReleaseOne();
         }
 
         private void parseLogLines()
         {
             int count = 0;
+            int controller = -1;
+            string cardId = null;
             foreach (string line in copyGameLogLines)
             {
                 Match heroMatch = RegexManager.heroIdRegex.Match(line);
@@ -75,12 +101,32 @@ namespace eraHS.LogReader
                     _heroEntityDict.Add(entityId, Hero.HeroIdList[heroId]);
                 }
 
-                Match playerMatch = RegexManager.playerNameRegex.Match(line);
-                if (playerMatch.Success)
+                Match playerEntityMatch = RegexManager.playerEntityRegex.Match(line);
+                if (playerEntityMatch.Success)
                 {
-                    string username = playerMatch.Groups[1].Value;
-                    int entityId = Int32.Parse(playerMatch.Groups[2].Value);
+                    string username = playerEntityMatch.Groups[1].Value;
+                    int entityId = Int32.Parse(playerEntityMatch.Groups[2].Value);
                     _playerEntityDict.Add(simplifyString(username), entityId);
+                }
+
+                Match cardIdCreationMatch = RegexManager.cardIdCreationRegex.Match(line);
+                if (cardIdCreationMatch.Success)
+                {
+                    cardId = cardIdCreationMatch.Groups["cardId"].Value;
+                }
+
+                Match playerIdMatch = RegexManager.playerIdRegex.Match(line);
+                if (playerIdMatch.Success)
+                {
+                    string username = playerIdMatch.Groups[1].Value;
+                    int playerId = Int32.Parse(playerIdMatch.Groups[2].Value);
+                    _playerIdDict.Add(playerId, simplifyString(username));
+                }
+
+                Match controllerMatch = RegexManager.controllerRegex.Match(line);
+                if (controllerMatch.Success)
+                {
+                    if (controller < 0) controller = Int32.Parse(controllerMatch.Groups["value"].Value);
                 }
 
                 Match gameResultMatch = RegexManager.gameResultRegex.Match(line);
@@ -91,15 +137,35 @@ namespace eraHS.LogReader
                     string result = gameResultMatch.Groups[2].Value;
                     if (_playerEntityDict.ContainsKey(simplifyString(username)))
                     {
-                        Console.WriteLine(username + '\t'
+                        string output = username + '\t'
                             + _heroEntityDict[_playerEntityDict[simplifyString(username)]]
-                            + '\t' + result);
+                            + '\t' + result;
+
+                        if (!string.IsNullOrEmpty(cardId))
+                        {
+                            if (_playerIdDict[controller] == simplifyString(username))
+                            {
+                                output += '\t' + "ME";
+                            }
+                        }
+                        else
+                        {
+                            int id = controller % 2 + 1;
+                            if (_playerIdDict[id] == simplifyString(username))
+                            {
+                                output += '\t' + "ME";
+                            }
+                        }
+                        Console.WriteLine(controller+"");
+                        Console.WriteLine(cardId);
+                        Console.WriteLine(output);
                     }
 
                     if (count % 2 == 0)
                     {
                         _playerEntityDict.Clear();
                         _heroEntityDict.Clear();
+                        _playerIdDict.Clear();
                     }
                 }
             }
