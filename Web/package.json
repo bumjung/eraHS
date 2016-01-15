@@ -1,0 +1,23 @@
+{
+  "name": "eraHS",
+  "description": "",
+  "version": "0.0.1",
+  "dependencies": {
+    "body-parser": "^1.9.0",
+    "bower": "*",
+    "ejs": "^2.3.1",
+    "express": "~4.*",
+    "express-session": "^1.8.2",
+    "method-override": "^2.2.0",
+    "mongoose": "^4.0.5",
+    "q": "^1.4.1",
+    "request": "^2.55.0",
+    "underscore": "^1.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+  }
+}

@@ -43,7 +43,7 @@ namespace eraHS.LogReader
                             _offset += Encoding.UTF8.GetByteCount(line + Environment.NewLine);
                             if (endGameMatch.Success)
                             {
-                                LogManager.sync.SignalAndWait();
+                                LogManager.barrier.SignalAndWait();
                                 return;
                             }
                         }

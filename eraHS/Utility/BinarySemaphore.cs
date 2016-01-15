@@ -27,7 +27,8 @@ namespace eraHS.Utility
             {
                 sem.Release(1);
             }
-            catch { };
+            catch (SemaphoreFullException e) {
+            };
         }
     }
 }

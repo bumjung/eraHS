@@ -45,9 +45,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Constants\Hearthstone\GameResult.cs" />
     <Compile Include="Constants\Hearthstone\Hero.cs" />
     <Compile Include="LogReader\LogManager.cs" />
     <Compile Include="LogReader\LogReader.cs" />
+    <Compile Include="LogReader\LogWatcher.cs" />
     <Compile Include="TaskTrayApplicationContext.cs" />
     <Compile Include="Configuration.cs">
       <SubType>Form</SubType>
@@ -60,7 +62,9 @@
     <Compile Include="Utility\BinarySemaphore.cs" />
     <Compile Include="Utility\ConfigManager.cs" />
     <Compile Include="Utility\ExtensionMethods.cs" />
+    <Compile Include="Utility\Json.cs" />
     <Compile Include="Utility\RegexHelper\RegexManager.cs" />
+    <Compile Include="Utility\Request.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
