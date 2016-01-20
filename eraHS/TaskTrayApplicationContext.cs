@@ -1,9 +1,11 @@
-﻿using eraHS.LogReader;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+
+using eraHS.LogReader;
+using eraHS.Utility;
 
 namespace eraHS
 {
@@ -14,12 +16,65 @@ namespace eraHS
 
         public TaskTrayApplicationContext()
         {
+            Console.WriteLine("Starting app");
             this.init();
             LogManager logManager = new LogManager();
+            ConfigManager configManager = new ConfigManager();
+
             var logThread = new Thread(() => {
+                configManager.init();
                 logManager.start();
             });
             logThread.Start();
+
+            var testThread = new Thread(() =>
+            {
+                Random rnd = new Random();
+
+                string[] testLines = System.IO.File.ReadAllLines(Config.userFilePath + @"\testing.txt");
+
+                int i = 0;
+                int random = rnd.Next(20, 101);
+                while (i < testLines.Length)
+                {
+                    if (random-- < 0)
+                    {
+                        random = rnd.Next(100, 1001);
+                        Thread.Sleep(1000);
+                    }
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(Config.userFilePath + @"\Power_1.log", true))
+                    {
+                        file.WriteLine(testLines[i]);
+
+                    }
+                    i++;
+                }
+            });
+            testThread.Start();
+
+            var lsTestThread = new Thread(() =>
+            {
+                Random rnd = new Random();
+
+                string[] testLines = System.IO.File.ReadAllLines(Config.userFilePath + @"\lsTest.txt");
+
+                int i = 0;
+                int random = rnd.Next(1, 5);
+                while (i < testLines.Length)
+                {
+                    if (random-- < 0)
+                    {
+                        random = rnd.Next(1, 5);
+                        Thread.Sleep(1000);
+                    }
+                    using (System.IO.StreamWriter file = new System.IO.StreamWriter(Config.userFilePath + @"\LoadingScreen.log", true))
+                    {
+                        file.WriteLine(testLines[i]);
+                    }
+                    i++;
+                }
+            });
+            lsTestThread.Start();
         }
 
         void init()

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eraHS.Utility
 {
-    public class Json
+    class Json
     {
         private Dictionary<string, string> dictionary;
 

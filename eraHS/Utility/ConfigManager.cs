@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace eraHS.Utility
 {
-    public static class ConfigManager
+    class ConfigManager
     {
-        public static void init()
+        public void init()
         {
-            string configContent = "[Achievements]\nLogLevel=1\nFilePrinting=true\nConsolePrinting=true\nScreenPrinting=false\n\n[Power]\nLogLevel=1\nFilePrinting=true\nConsolePrinting=true\nScreenPrinting=false";
+            string configContent = "[Power]\nLogLevel=1\nFilePrinting=true\nConsolePrinting=true\nScreenPrinting=false\n\n[LoadingScreen]\nLogLevel=1\nFilePrinting=true\nConsolePrinting=true\nScreenPrinting=false";
 
             if (!System.IO.File.Exists(Config.configFilePath))
             {

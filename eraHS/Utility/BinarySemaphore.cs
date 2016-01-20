@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace eraHS.Utility
 {
 
-    public class BinarySemaphore
+    class BinarySemaphore
     {
         private Semaphore sem;
         public BinarySemaphore(int start, int end)

@@ -47,8 +47,10 @@
     <Compile Include="Config.cs" />
     <Compile Include="Constants\Hearthstone\GameResult.cs" />
     <Compile Include="Constants\Hearthstone\Hero.cs" />
+    <Compile Include="LogReader\Classes\BaseReader.cs" />
+    <Compile Include="LogReader\Classes\ModeReader.cs" />
+    <Compile Include="LogReader\Classes\PowerReader.cs" />
     <Compile Include="LogReader\LogManager.cs" />
-    <Compile Include="LogReader\LogReader.cs" />
     <Compile Include="LogReader\LogWatcher.cs" />
     <Compile Include="TaskTrayApplicationContext.cs" />
     <Compile Include="Configuration.cs">
@@ -92,6 +94,7 @@
     <Content Include="AppIcon.ico" />
     <None Include="Resources\AppIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

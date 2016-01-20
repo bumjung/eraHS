@@ -5,7 +5,7 @@ using System.Net;
 
 namespace eraHS.Utility
 {
-    public static class Request
+    static class Request
     {
         private static string _baseAddress = "http://localhost:4455/api/game/";
 

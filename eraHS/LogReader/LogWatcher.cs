@@ -1,17 +1,21 @@
 ﻿using System;
 using System.IO;
 
+using eraHS.Utility;
+
 namespace eraHS.LogReader
 {
-    public class LogWatcher
+    class LogWatcher
     {
         private FileSystemWatcher _watcher;
+        private BinarySemaphore _sem;
         private int _watcherCount;
         private string _configFilePath;
 
-        public LogWatcher(string configFilePath)
+        public LogWatcher(string configFilePath, ref BinarySemaphore sem)
         {
             _watcher = new FileSystemWatcher();
+            _sem = sem;
             _watcherCount = 0;
             _configFilePath = configFilePath;
         }
@@ -28,7 +32,7 @@ namespace eraHS.LogReader
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            if (++_watcherCount % 2 == 0) LogManager.sem.ReleaseOne();
+            if (++_watcherCount % 2 == 0) _sem.ReleaseOne();
         }
     }
 }
