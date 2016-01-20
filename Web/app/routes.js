@@ -14,7 +14,7 @@ var routes = function (app, router) {
     // middleware to use for all requests
     router.use(function (req, res, next) {
         // do logging
-        console.log('Something is happening.');
+        console.log(new Date(), req.method, decodeURI(req.url));
         next();
     });
 
