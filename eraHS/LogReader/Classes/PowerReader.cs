@@ -22,7 +22,7 @@ namespace eraHS.LogReader.Classes
 
         public PowerReader()
         {
-            _logFileName = @"/Power_1.log";
+            _logFileName = @"/Power.log";
             base.init();
             _regexList.Add(RegexManager.createGameRegex);
             _regexList.Add(RegexManager.goldRewardRegex);

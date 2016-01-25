@@ -22,13 +22,13 @@ namespace eraHS.LogReader
 
         public void start()
         {
-            _watcher.Path = Config.userFilePath;
-            _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-                                    | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            _watcher.Path = Config.hsLogDirPath;
+            _watcher.NotifyFilter = NotifyFilters.LastWrite;
             _watcher.Filter = _configFilePath;
             _watcher.Changed += new FileSystemEventHandler(OnChanged);
             _watcher.EnableRaisingEvents = true;
         }
+
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {

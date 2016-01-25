@@ -10,22 +10,29 @@ namespace eraHS.Utility
 
     class BinarySemaphore
     {
-        private Semaphore sem;
+        private Semaphore _sem;
+        private int _count;
         public BinarySemaphore(int start, int end)
         {
-            sem = new Semaphore(start, end);
+            _count = 0;
+            _sem = new Semaphore(start, end);
         }
 
         public void WaitOne()
         {
-            sem.WaitOne();
+            _count++;
+            _sem.WaitOne();
         }
 
         public void ReleaseOne()
         {
             try
             {
-                sem.Release(1);
+                if (_count > 0)
+                {
+                    _sem.Release(1);
+                    _count--;
+                }
             }
             catch (SemaphoreFullException e) {
             };

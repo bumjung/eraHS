@@ -9,6 +9,11 @@ namespace eraHS
     public class Config
     {
         public static readonly string userFilePath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%");
-        public static readonly string configFilePath = userFilePath + @"\log.config";
+        public static readonly string programFilePath = Environment.GetEnvironmentVariable(@"ProgramFiles(x86)");
+
+        public static readonly string configFilePath = userFilePath + @"\AppData\Local\Blizzard\Hearthstone\log.config";
+        public static readonly string hsLogDirPath = Config.programFilePath + @"/Hearthstone/Logs";
+
+        public static readonly int timeToWaitForMultipleLogLines = 5000;
     }
 }

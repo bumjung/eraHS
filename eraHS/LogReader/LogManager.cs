@@ -70,6 +70,8 @@ namespace eraHS.LogReader
 
             if (!resultJson.Empty())
             {
+                Logger.log("Sending Request");
+
                 _modeReader.parseLogLines(resultJson);
                 Request.Post(resultJson.ToString());
             }

@@ -30,7 +30,7 @@ namespace eraHS.LogReader.Classes
             this.LogLines = new List<String>();
             this.CopyLogLines = new List<String>();
 
-            _logFilePath = Config.userFilePath + _logFileName;
+            _logFilePath = Config.hsLogDirPath + _logFileName;
             _offset = 0;
             _sem = new BinarySemaphore(0, 1);
             _matchIndex = 0;
@@ -48,20 +48,24 @@ namespace eraHS.LogReader.Classes
         {
             while (true)
             {
+                Logger.log("Before entering FileStream");
                 using (FileStream fileStream = new FileStream(_logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
+                    Logger.log("Successfully entered filestream");
                     fileStream.Seek(_offset, SeekOrigin.Begin);
 
+                    Logger.log("Before entered StreamReader");
                     using (var streamReader = new StreamReader(fileStream))
                     {
+                        Logger.log("Successfully entered StreamReader");
                         string line = "";
                         while (!streamReader.EndOfStream && (line = streamReader.ReadLine()) != null)
                         {
                             this.LogLines.Add(line);
-
                             Match match = _regexList[_matchIndex].Match(line);
                             if (match.Success)
                             {
+                                Logger.log(line);
                                 _matchIndex++;
                             }
 
@@ -74,9 +78,10 @@ namespace eraHS.LogReader.Classes
                                 return;
                             }
                         }
-                        _sem.WaitOne();
                     }
                 }
+                _sem.WaitOne();
+                Thread.Sleep(Config.timeToWaitForMultipleLogLines);
             }
         }
     }
